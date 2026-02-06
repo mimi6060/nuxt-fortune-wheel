@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install && cd playground && npm install",
+  "buildCommand": "cd playground && npx prisma generate && npx nuxt build",
+  "outputDirectory": "playground/.output/public",
+  "framework": null
+}

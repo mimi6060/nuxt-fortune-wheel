@@ -3,8 +3,9 @@
   "name": "fortune-wheel-playground",
   "type": "module",
   "scripts": {
+    "postinstall": "nuxt prepare",
     "dev": "nuxt dev",
-    "build": "nuxt build",
+    "build": "prisma generate && nuxt build",
     "start": "npm run db:deploy && node .output/server/index.mjs",
     "start:dev": "npm run db:push:auto && nuxt dev",
     "generate": "nuxt generate",
