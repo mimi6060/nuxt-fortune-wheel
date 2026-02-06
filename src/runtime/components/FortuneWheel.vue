@@ -53,7 +53,7 @@ watch(() => props.prizes, async (newPrizes) => {
   for (const prize of newPrizes) {
     if (prize.image && !imagesLoaded.value.has(prize.image)) {
       const img = new window.Image()
-      img.crossOrigin = 'anonymous'
+      // Note: crossOrigin removed to allow images from servers without CORS headers
       img.onload = () => {
         imagesLoaded.value.set(prize.image!, img)
         drawWheel()
