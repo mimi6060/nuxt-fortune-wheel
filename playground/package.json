@@ -1,0 +1,35 @@
+{
+  "private": true,
+  "name": "fortune-wheel-playground",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "npm run db:deploy && node .output/server/index.mjs",
+    "start:dev": "npm run db:push:auto && nuxt dev",
+    "generate": "nuxt generate",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --url $DATABASE_URL",
+    "db:push:auto": "prisma db push --url $DATABASE_URL --accept-data-loss",
+    "db:deploy": "prisma migrate deploy --url $DATABASE_URL",
+    "db:migrate": "prisma migrate dev --url $DATABASE_URL",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio --url $DATABASE_URL",
+    "db:reset": "prisma migrate reset --force --url $DATABASE_URL && npm run db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.3.0",
+    "nuxt": "^4.3.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "dotenv": "^17.2.4",
+    "pg": "^8.18.0",
+    "prisma": "^7.3.0",
+    "tsx": "^4.21.0"
+  }
+}

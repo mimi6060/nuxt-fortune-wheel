@@ -1,0 +1,68 @@
+// Prisma Schema for Fortune Wheel
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Product catalog - available products that can be added as prizes
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  image          String?
+  suggestedColor String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  prizes Prize[]
+}
+
+// Prize configuration for the wheel
+model Prize {
+  id            String    @id @default(cuid())
+  type          PrizeType
+  name          String
+  image         String?
+  probability   Int // Percentage (1-100)
+  color         String // Hex color
+  discountValue Int? // For discount type only
+
+  // Relation to product (for product type)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  // Relation to wheel config
+  wheelConfigId String
+  wheelConfig   WheelConfig @relation(fields: [wheelConfigId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([wheelConfigId])
+}
+
+// Wheel configuration
+model WheelConfig {
+  id             String  @id @default(cuid())
+  name           String  @default("default")
+  availableSpins Int     @default(3)
+  spinDuration   Int     @default(4000) // in milliseconds
+  isActive       Boolean @default(true)
+
+  prizes Prize[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name])
+}
+
+enum PrizeType {
+  product
+  discount
+  lost
+}

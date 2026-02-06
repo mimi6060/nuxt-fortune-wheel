@@ -1,0 +1,55 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: fortune-wheel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fortune
+      POSTGRES_PASSWORD: fortune_secret
+      POSTGRES_DB: fortune_wheel
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fortune -d fortune_wheel"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Nuxt Application
+  app:
+    build:
+      context: ..
+      dockerfile: playground/Dockerfile
+    container_name: fortune-wheel-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      DATABASE_URL: postgresql://fortune:fortune_secret@db:5432/fortune_wheel
+      NUXT_HOST: 0.0.0.0
+      NUXT_PORT: 3001
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Prisma Studio
+  studio:
+    image: node:20-alpine
+    container_name: fortune-wheel-studio
+    working_dir: /app/playground
+    command: sh -c "npx prisma@6.8.0 studio --port 5555 --browser none --hostname 0.0.0.0"
+    ports:
+      - "127.0.0.1:5555:5555"
+    environment:
+      DATABASE_URL: postgresql://fortune:fortune_secret@db:5432/fortune_wheel
+    volumes:
+      - ./prisma:/app/playground/prisma:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

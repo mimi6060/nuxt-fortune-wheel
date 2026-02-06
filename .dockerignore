@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+playground/node_modules
+
+# Build outputs
+dist
+.nuxt
+.output
+
+# Generated
+playground/generated
+
+# Git
+.git
+.gitignore
+
+# Misc
+*.log
+*.md
+.DS_Store
+.vscode
+.idea
