@@ -4,17 +4,17 @@ import { PrismaClient } from '../generated/prisma'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 
-// Parse connection string and add SSL config
+// Parse connection string and add SSL config if needed
 const connectionUrl = new URL(process.env.DATABASE_URL!)
+const needsSsl = connectionUrl.searchParams.get('sslmode') === 'require' ||
+  connectionUrl.hostname.includes('aivencloud.com')
 const pool = new pg.Pool({
   host: connectionUrl.hostname,
   port: Number(connectionUrl.port) || 5432,
   database: connectionUrl.pathname.slice(1),
   user: connectionUrl.username,
   password: decodeURIComponent(connectionUrl.password),
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
 })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
@@ -35,7 +35,7 @@ const colors = [
   '#FBC02D', '#FFA000', '#F57C00',
 ]
 
-// All 48 products from Sitadis ALCOOLS category
+// All 48 products from Sitadis ALCOOLS category - REAL Sitadis codes
 const productsData = [
   { code: '406030', name: 'CYNAR 16.5% 1L', ext: 'JPG' },
   { code: '402050', name: 'CENTERBA 70% 50CL', ext: 'JPG' },
@@ -47,44 +47,44 @@ const productsData = [
   { code: 'HAVA002', name: 'RHUM BRUN ESPECIAL 37.5° 1L', ext: 'jpg' },
   { code: 'MART05', name: 'MARTINI ROSSO 14.5% 1.5L', ext: 'jpg' },
   { code: 'MART06', name: 'MARTINI BIANCO 14.5% 1.5L', ext: 'jpg' },
-  { code: 'SAMB001', name: 'SAMBUCA EXTRA 40% 1L', ext: 'jpg' },
-  { code: 'PORT001', name: 'PORTO WHITE 19.5° 75CL', ext: 'jpg' },
-  { code: 'PORT002', name: 'PORTO TAWNY 19° 75CL', ext: 'jpg' },
-  { code: 'RICA001', name: 'RICARD PASTIS 45% 1L', ext: 'jpg' },
-  { code: 'BAIL001', name: 'BAILEYS 17° 1L', ext: 'jpg' },
-  { code: 'PISA001', name: 'PISANG FUNNY 0°C 70CL', ext: 'jpg' },
-  { code: 'COGN001', name: 'COGNAC FINE CUISINE 30° 1L', ext: 'jpg' },
-  { code: 'CASS001', name: 'CREME CASSIS 16° 70CL', ext: 'jpg' },
-  { code: 'PINE001', name: 'PINEAU CHARENTES BLANC 17° 75CL', ext: 'jpg' },
-  { code: 'VECC001', name: 'VECCHIA ROMAGNA BRANDY 38° 1L', ext: 'jpg' },
-  { code: 'AMAR001', name: 'AMARETTO 28% 1L', ext: 'jpg' },
-  { code: 'COIN001', name: 'COINTREAU 40° 1L', ext: 'jpg' },
-  { code: 'GORD001', name: 'GIN GORDONS 37.5% 1L', ext: 'jpg' },
-  { code: 'JWRE001', name: 'WHISKY J.WALKER RED 40% 1L', ext: 'jpg' },
-  { code: 'WHJB001', name: 'WHISKY JB 40% 1L', ext: 'jpg' },
-  { code: 'BATI001', name: 'BATIDA DE COCO 16° 1L', ext: 'jpg' },
-  { code: 'PICO001', name: 'PICON AMER 21% 1L', ext: 'jpg' },
-  { code: 'RHBL001', name: 'RHUM BLANC CARTA BLANCA 37.5% 1L', ext: 'jpg' },
-  { code: 'WILL001', name: 'WILLIAM LAWSONS WHISKY 40° 1L', ext: 'jpg' },
-  { code: 'FERN002', name: 'FERNET BRANCA MENTHE 28° 70CL', ext: 'jpg' },
-  { code: 'FERN001', name: 'FERNET BRANCA 35% 70CL', ext: 'jpg' },
-  { code: 'JACK001', name: 'WHISKY JACK DANIELS 40% 1L', ext: 'jpg' },
-  { code: 'PISA002', name: 'PISANG AMBON 17% 1L', ext: 'jpg' },
-  { code: 'PASS001', name: 'PASSOA 17° 1L', ext: 'jpg' },
-  { code: 'CAPO001', name: 'AMARO DEL CAPO 35% 1L', ext: 'jpg' },
-  { code: 'CAPO003', name: 'AMARO DEL CAPO 35% 3L BOIS', ext: 'jpg' },
-  { code: 'CAPO002', name: 'AMARO DEL CAPO 35% 70CL', ext: 'jpg' },
-  { code: 'CAPO004', name: 'AMARO DEL CAPO COFFRET 70CL', ext: 'jpg' },
-  { code: 'CAPO005', name: 'AMARO DEL CAPO RISERVA 37.5% 70CL', ext: 'jpg' },
-  { code: 'CAPO006', name: 'AMARO DEL CAPO RED HOT 35% 70CL', ext: 'jpg' },
-  { code: 'VODK001', name: 'VODKA 37.5° 1L', ext: 'jpg' },
-  { code: 'CALV001', name: 'CALVADOS GRAND SOLAGE 40° 70CL', ext: 'jpg' },
-  { code: 'MONT001', name: 'AMARO MONTENEGRO 23% 70CL', ext: 'jpg' },
+  { code: 'SAMB024', name: 'SAMBUCA EXTRA 40% 1L', ext: 'jpg' },
+  { code: 'SAND024', name: 'PORTO WHITE 19.5° 75CL', ext: 'jpg' },
+  { code: 'SAND025', name: 'PORTO TAWNY 19° 75CL', ext: 'jpg' },
+  { code: 'TAST5', name: 'RICARD PASTIS 45% 1L', ext: 'jpg' },
+  { code: 'TAST15', name: 'BAILEYS 17° 1L', ext: 'jpg' },
+  { code: 'TAST16', name: 'PISANG FUNNY 0°C 70CL', ext: 'jpg' },
+  { code: 'TAST89', name: 'COGNAC FINE CUISINE 30° 1L', ext: 'jpg' },
+  { code: 'DEMA001', name: 'CREME CASSIS 16° 70CL', ext: 'jpg' },
+  { code: 'DELO001', name: 'PINEAU CHARENTES BLANC 17° 75CL', ext: 'jpg' },
+  { code: 'CINO001', name: 'VECCHIA ROMAGNA BRANDY 38° 1L', ext: 'jpg' },
+  { code: 'DISA001', name: 'AMARETTO 28% 1L', ext: 'jpg' },
+  { code: 'ALPH009', name: 'COINTREAU 40° 1L', ext: 'jpg' },
+  { code: 'ALPH010', name: 'GIN GORDONS 37.5% 1L', ext: 'jpg' },
+  { code: 'ALPH012', name: 'WHISKY J.WALKER RED 40% 1L', ext: 'jpg' },
+  { code: 'ALPH014', name: 'WHISKY JB 40% 1L', ext: 'jpg' },
+  { code: 'ALPH017', name: 'BATIDA DE COCO 16° 1L', ext: 'JPG' },
+  { code: 'ALPH018', name: 'PICON AMER 21% 1L', ext: 'jpg' },
+  { code: 'ALPH019', name: 'RHUM BLANC CARTA BLANCA 37.5% 1L', ext: 'jpg' },
+  { code: 'ALPH020', name: 'WILLIAM LAWSONS WHISKY 40° 1L', ext: 'jpg' },
+  { code: 'ALPH021', name: 'FERNET BRANCA MENTHE 28° 70CL', ext: 'jpg' },
+  { code: 'ALPH022', name: 'FERNET BRANCA 35% 70CL', ext: 'jpg' },
+  { code: 'ALPH027', name: 'WHISKY JACK DANIELS 40% 1L', ext: 'jpg' },
+  { code: 'ALPH029', name: 'PISANG AMBON 17% 1L', ext: 'jpg' },
+  { code: 'ALPH031', name: 'PASSOA 17° 1L', ext: 'jpg' },
+  { code: 'AMAR002', name: 'AMARO DEL CAPO 35% 1L', ext: 'jpg' },
+  { code: 'AMAR003', name: 'AMARO DEL CAPO 35% 3L BOIS', ext: 'jpg' },
+  { code: 'AMAR004', name: 'AMARO DEL CAPO 35% 70CL', ext: 'jpg' },
+  { code: 'AMAR005', name: 'AMARO DEL CAPO COFFRET 70CL', ext: 'JPG' },
+  { code: 'AMAR006', name: 'AMARO DEL CAPO RISERVA 37.5% 70CL', ext: 'jpg' },
+  { code: 'AMAR008', name: 'AMARO DEL CAPO RED HOT 35% 70CL', ext: 'jpg' },
+  { code: 'SMIR001', name: 'VODKA 37.5° 1L', ext: 'jpg' },
+  { code: 'BOUL002', name: 'CALVADOS GRAND SOLAGE 40° 70CL', ext: 'jpg' },
+  { code: 'MONT011', name: 'AMARO MONTENEGRO 23% 70CL', ext: 'jpg' },
   { code: 'ROSS001', name: 'ROSSO ANTICO VIN CUIT 16° 75CL', ext: 'jpg' },
-  { code: 'GRAN001', name: 'GRAND MARNIER 40% 70CL', ext: 'jpg' },
-  { code: 'SICI001', name: 'AMARO SICILIEN 29% 70CL', ext: 'jpg' },
-  { code: 'SAMB002', name: 'SAMBUCA BIANCA 40% 70CL', ext: 'jpg' },
-  { code: 'AMAR002', name: 'AMARETTO 21% 70CL', ext: 'jpg' },
+  { code: 'GRAN005', name: 'GRAND MARNIER 40% 70CL', ext: 'jpg' },
+  { code: 'AVER002', name: 'AMARO SICILIEN 29% 70CL', ext: 'jpg' },
+  { code: '402009', name: 'SAMBUCA BIANCA 40% 70CL', ext: 'jpg' },
+  { code: '406029', name: 'AMARETTO 21% 70CL', ext: 'jpg' },
 ]
 
 async function main() {
@@ -120,28 +120,25 @@ async function main() {
       isActive: true,
       prizes: {
         create: [
-          // 3 Products (15% total)
+          // 3 Products (15% total) - No images for cleaner wheel display
           {
             type: 'product',
             productId: 'CAMP1',
             name: 'CAMPARI 25% 1L',
-            image: `${SITADIS_IMG}/CAMP1/CAMP1.jpg`,
             probability: 5,
             color: '#C62828',
           },
           {
             type: 'product',
-            productId: 'CAPO001',
+            productId: 'AMAR002',
             name: 'AMARO DEL CAPO 35% 1L',
-            image: `${SITADIS_IMG}/CAPO001/CAPO001.jpg`,
             probability: 5,
             color: '#1565C0',
           },
           {
             type: 'product',
-            productId: 'JACK001',
+            productId: 'ALPH027',
             name: 'WHISKY JACK DANIELS 40% 1L',
-            image: `${SITADIS_IMG}/JACK001/JACK001.jpg`,
             probability: 5,
             color: '#4E342E',
           },
