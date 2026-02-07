@@ -30,6 +30,7 @@ const wheelPrizes = ref<Prize[]>([])
 const availableSpins = ref(3)
 const spinDuration = ref(4000)
 const isLoading = ref(true)
+const isSaving = ref(false)
 
 // Form state
 const showAddForm = ref(false)
@@ -180,25 +181,33 @@ function closeForm() {
 }
 
 async function savePrize() {
-  const prizeData = buildPrizeFromForm(editingPrize.value?.id || '')
+  if (isSaving.value) return
+  isSaving.value = true
 
-  if (editingPrize.value) {
-    const updated = await apiUpdatePrize(editingPrize.value.id, prizeData)
-    if (updated) {
-      const index = wheelPrizes.value.findIndex(p => p.id === editingPrize.value!.id)
-      if (index !== -1) {
-        wheelPrizes.value[index] = updated
+  try {
+    const prizeData = buildPrizeFromForm(editingPrize.value?.id || '')
+
+    if (editingPrize.value) {
+      const updated = await apiUpdatePrize(editingPrize.value.id, prizeData)
+      if (updated) {
+        const index = wheelPrizes.value.findIndex(p => p.id === editingPrize.value!.id)
+        if (index !== -1) {
+          wheelPrizes.value[index] = updated
+        }
       }
     }
-  }
-  else {
-    const { id, ...newPrizeData } = prizeData
-    const newPrize = await apiAddPrize(newPrizeData)
-    if (newPrize) {
-      wheelPrizes.value.push(newPrize)
+    else {
+      const { id, ...newPrizeData } = prizeData
+      const newPrize = await apiAddPrize(newPrizeData)
+      if (newPrize) {
+        wheelPrizes.value.push(newPrize)
+      }
     }
+    closeForm()
   }
-  closeForm()
+  finally {
+    isSaving.value = false
+  }
 }
 
 function buildPrizeFromForm(id: string): Prize {
@@ -579,16 +588,18 @@ function getPrizeIcon(type: PrizeTypeValue) {
         <div class="form-actions">
           <button
             class="btn-secondary"
+            :disabled="isSaving"
             @click="closeForm"
           >
             Annuler
           </button>
           <button
             class="btn-primary"
-            :disabled="formType === PrizeType.PRODUCT && !formProductId"
+            :disabled="isSaving || (formType === PrizeType.PRODUCT && !formProductId)"
             @click="savePrize"
           >
-            {{ editingPrize ? 'Enregistrer' : 'Ajouter' }}
+            <span v-if="isSaving">Enregistrement...</span>
+            <span v-else>{{ editingPrize ? 'Enregistrer' : 'Ajouter' }}</span>
           </button>
         </div>
       </div>

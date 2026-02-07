@@ -92,6 +92,8 @@ function closeModal() {
 }
 
 function spinWheel() {
+  if (isSpinning.value || availableSpins.value <= 0) return
+  isSpinning.value = true
   const index = wheelRef.value?.selectRandomPrizeIndex()
   if (index !== undefined) {
     wheelRef.value?.spinToIndex(index)
