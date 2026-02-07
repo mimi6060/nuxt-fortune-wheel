@@ -197,33 +197,12 @@ function drawSegmentContent(
   ctx.translate(cx, cy)
   ctx.rotate(midAngle)
 
-  // Draw image near center
-  if (prize.image && imagesLoaded.value.has(prize.image)) {
-    const img = imagesLoaded.value.get(prize.image)!
-    const imgSize = 28
-    const imgDist = radius * 0.35
-
-    ctx.save()
-    ctx.translate(imgDist, 0)
-    ctx.rotate(-midAngle) // Counter-rotate to keep image upright
-
-    // White circle background
-    ctx.beginPath()
-    ctx.arc(0, 0, imgSize / 2 + 2, 0, 2 * Math.PI)
-    ctx.fillStyle = 'white'
-    ctx.fill()
-
-    // Clip and draw
-    ctx.beginPath()
-    ctx.arc(0, 0, imgSize / 2, 0, 2 * Math.PI)
-    ctx.clip()
-    ctx.drawImage(img, -imgSize / 2, -imgSize / 2, imgSize, imgSize)
-    ctx.restore()
-  }
+  // Note: Images are intentionally NOT displayed on wheel segments for cleaner design
+  // Images are still loaded and available for use in the WinModal after spin
 
   // Draw text RADIALLY (along the spoke), CENTERED in the segment
   const text = prize.name
-  const innerRadius = prize.image ? radius * 0.52 : radius * 0.22
+  const innerRadius = radius * 0.22
   const outerRadius = radius * 0.88
   const availableLength = outerRadius - innerRadius
   const centerRadius = (innerRadius + outerRadius) / 2
